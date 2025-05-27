@@ -24,3 +24,23 @@ Route::get('/users/{user}', function (User $user) {
 })->name('profile.show');
 
 require __DIR__.'/auth.php';
+
+// FAQ route voor bezoekers
+Route::get('/faq', [App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
+
+// Admin routes (later voor beheer)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('faq-categories', App\Http\Controllers\Admin\FaqController::class);
+});
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function() {
+        $users = \App\Models\User::all();
+        return view('admin.dashboard', compact('users'));
+    })->name('dashboard');
+});
+
+// Contact routes
+Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');

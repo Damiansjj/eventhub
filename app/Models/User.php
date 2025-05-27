@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -43,6 +44,31 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin()
+    {
+        return $this->is_admin;
+    }
+
+    /**
+     * Make user admin
+     */
+    public function makeAdmin()
+    {
+        $this->update(['is_admin' => true]);
+    }
+
+    /**
+     * Remove admin rights
+     */
+    public function removeAdmin()
+    {
+        $this->update(['is_admin' => false]);
     }
 }
