@@ -124,11 +124,20 @@ class User extends Authenticatable
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        if (request()->is('profiles/*')) {
-            return $this->where('username', $value)->firstOrFail();
+        // First try to find by username
+        $user = $this->where('username', $value)->first();
+        
+        // If not found by username, try to find by ID
+        if (!$user) {
+            $user = $this->where('id', $value)->first();
         }
         
-        return $this->where('id', $value)->firstOrFail();
+        // If still not found, throw 404
+        if (!$user) {
+            abort(404);
+        }
+        
+        return $user;
     }
 
     /**

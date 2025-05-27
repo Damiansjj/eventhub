@@ -2,44 +2,57 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\News;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class NewsSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $admin = User::where('is_admin', true)->first();
+        // Get or create admin user
+        $admin = User::where('email', 'admin@ehb.be')->first();
         
         if (!$admin) {
-            // Maak een admin als die er niet is
             $admin = User::create([
                 'name' => 'Admin',
-                'email' => 'admin@eventhub.com',
-                'password' => bcrypt('password'),
+                'email' => 'admin@ehb.be',
+                'password' => bcrypt('Password!321'),
                 'is_admin' => true,
             ]);
         }
 
-        News::create([
-            'title' => 'Welkom bij EventHub!',
-            'slug' => 'welkom-bij-eventhub',
-            'content' => 'Dit is het eerste nieuwsartikel op EventHub. Hier kun je alle laatste nieuwtjes en updates vinden over onze evenementen en community.',
-            'excerpt' => 'Welkom bij EventHub, jouw nieuwe thuis voor evenementen en community nieuws.',
-            'is_published' => true,
-            'published_at' => now(),
-            'author_id' => $admin->id,
-        ]);
+        // Create some test news items
+        $news = [
+            [
+                'title' => 'Welkom bij EventHub!',
+                'content' => 'EventHub is jouw nieuwe platform voor het organiseren en ontdekken van evenementen. Blijf op de hoogte van de laatste updates en nieuws over komende evenementen.',
+                'excerpt' => 'Ontdek het nieuwe EventHub platform',
+                'is_published' => true,
+                'published_at' => now()->subDays(5),
+                'author_id' => $admin->id,
+            ],
+            [
+                'title' => 'Nieuwe Functies Toegevoegd',
+                'content' => 'We hebben verschillende nieuwe functies toegevoegd aan het platform, waaronder een verbeterd profiel systeem en een FAQ sectie. Ontdek alle nieuwe mogelijkheden!',
+                'excerpt' => 'Verken de nieuwe features op EventHub',
+                'is_published' => true,
+                'published_at' => now()->subDays(3),
+                'author_id' => $admin->id,
+            ],
+            [
+                'title' => 'Tips voor Evenement Organisatoren',
+                'content' => 'Ben je van plan een evenement te organiseren? Lees onze handige tips voor een succesvol evenement. Van planning tot promotie, wij helpen je op weg.',
+                'excerpt' => 'Handige tips voor het organiseren van evenementen',
+                'is_published' => true,
+                'published_at' => now()->subDay(),
+                'author_id' => $admin->id,
+            ],
+        ];
 
-        News::create([
-            'title' => 'Nieuwe functies toegevoegd',
-            'slug' => 'nieuwe-functies-toegevoegd',
-            'content' => 'We hebben verschillende nieuwe functies toegevoegd aan het platform, waaronder betere profielen en een verbeterde zoekfunctie.',
-            'excerpt' => 'Ontdek de nieuwe functies die we hebben toegevoegd.',
-            'is_published' => true,
-            'published_at' => now()->subDays(1),
-            'author_id' => $admin->id,
-        ]);
+        foreach ($news as $item) {
+            $item['slug'] = News::generateSlug($item['title']);
+            News::create($item);
+        }
     }
 }

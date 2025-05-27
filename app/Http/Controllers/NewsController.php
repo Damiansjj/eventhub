@@ -32,8 +32,10 @@ class NewsController extends Controller
             abort(404);
         }
 
-        // Increment views
-        $news->incrementViews();
+        // Increment views only if not admin and not author
+        if (!Auth::check() || (!Auth::user()->isAdmin() && Auth::user()->id !== $news->author_id)) {
+            $news->incrementViews();
+        }
 
         // Get related news
         $relatedNews = News::published()
@@ -104,7 +106,7 @@ class NewsController extends Controller
 
         $news->save();
 
-        return redirect()->route('news.manage')
+        return redirect()->route('admin.news.index')
             ->with('success', 'Nieuwsartikel succesvol aangemaakt!');
     }
 
@@ -159,7 +161,7 @@ class NewsController extends Controller
 
         $news->save();
 
-        return redirect()->route('news.manage')
+        return redirect()->route('admin.news.index')
             ->with('success', 'Nieuwsartikel succesvol bijgewerkt!');
     }
 
@@ -177,7 +179,7 @@ class NewsController extends Controller
 
         $news->delete();
 
-        return redirect()->route('news.manage')
+        return redirect()->route('admin.news.index')
             ->with('success', 'Nieuwsartikel succesvol verwijderd!');
     }
 

@@ -5,16 +5,13 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('news.index') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('news.index')" :active="request()->routeIs('news.*')">
                         {{ __('Nieuws') }}
                     </x-nav-link>
@@ -29,10 +26,6 @@
                     </x-nav-link>
                     
                     @if (Auth::check() && Auth::user()->isAdmin())
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-red-600 hover:text-red-900">
-                            {{ __('Admin Dashboard') }}
-                        </x-nav-link>
-                        
                         <x-nav-link :href="route('admin.news.index')" :active="request()->routeIs('admin.news.*')" class="text-red-600 hover:text-red-900">
                             {{ __('Nieuwsbeheer') }}
                         </x-nav-link>
@@ -51,12 +44,6 @@
             <!-- Right Side Navigation -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 @auth
-                    @if(auth()->user()->is_admin)
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')" class="text-red-600">
-                            {{ __('Admin Dashboard') }}
-                        </x-nav-link>
-                    @endif
-                    
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -115,9 +102,6 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('news.index')" :active="request()->routeIs('news.*')">
                 {{ __('Nieuws') }}
             </x-responsive-nav-link>
@@ -132,10 +116,6 @@
             </x-responsive-nav-link>
             
             @if (Auth::check() && Auth::user()->isAdmin())
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-red-600">
-                    {{ __('Admin Dashboard') }}
-                </x-responsive-nav-link>
-                
                 <x-responsive-nav-link :href="route('admin.news.index')" :active="request()->routeIs('admin.news.*')" class="text-red-600">
                     {{ __('Nieuwsbeheer') }}
                 </x-responsive-nav-link>

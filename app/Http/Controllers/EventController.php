@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -19,9 +20,17 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::where('is_published', true)
-            ->orderBy('start_date')
-            ->paginate(12);
+        $query = Event::query();
+
+        // Als de gebruiker een admin is, toon alle evenementen
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            $events = $query->orderBy('start_date')->paginate(12);
+        } else {
+            // Voor normale gebruikers, alleen gepubliceerde evenementen tonen
+            $events = $query->where('is_published', true)
+                ->orderBy('start_date')
+                ->paginate(12);
+        }
 
         return view('events.index', compact('events'));
     }
@@ -68,6 +77,11 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
+        // Alleen admins kunnen ongepubliceerde evenementen zien
+        if (!$event->is_published && (!Auth::check() || !Auth::user()->isAdmin())) {
+            abort(404);
+        }
+
         return view('events.show', compact('event'));
     }
 
