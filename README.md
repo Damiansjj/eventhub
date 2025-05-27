@@ -1,133 +1,90 @@
-# EventHub
+# EventHub Platform
 
-Een modern evenementenbeheerplatform gebouwd met Laravel, waar gebruikers evenementen kunnen bekijken en beheren.
+## Projectbeschrijving
+EventHub is een evenementenplatform waar de focus ligt op het beheren van evenementen via een admin dashboard.
 
-## 🌟 Functionaliteiten
+### Functionaliteiten
 
-### Voor Bezoekers
-- Bekijk gepubliceerde evenementen
-- Bekijk nieuwsartikelen
-- Bekijk FAQ
-- Contactformulier
-- Registreren/Inloggen
-
-### Voor Gebruikers
-- Persoonlijk profiel beheren
+#### Bezoekers
 - Evenementen bekijken
-- Nieuwsartikelen lezen en commentaar geven
-- Contact opnemen via contactformulier
+- Nieuws lezen
+- FAQ raadplegen
+- Contact opnemen
+- Gebruikersprofielen bekijken
 
-### Voor Administrators
-- Volledig evenementenbeheer (CRUD)
-  - Evenementen aanmaken, bewerken, verwijderen
-  - Publicatiestatus beheren
-- Nieuwsbeheer
-  - Artikelen schrijven en beheren
-  - Commentaren modereren
-- FAQ-beheer
-  - Categorieën en vragen beheren
+#### Geregistreerde Gebruikers
+- Profiel beheren
+  * Profielfoto uploaden
+  * Persoonlijke informatie aanpassen
+  * Account instellingen wijzigen
+
+
+#### Administrators
+- Dashboard
+  * Statistieken overzicht (gebruikers, nieuws, evenementen)
+  * Recente activiteiten bekijken
+  * Ongelezen berichten teller
+- Evenementenbeheer
+  * Evenementen aanmaken/bewerken/verwijderen
+  * Afbeeldingen uploaden
+  * Publicatiestatus beheren
+  * Deelnemers beheren
 - Gebruikersbeheer
-  - Gebruikersrollen toewijzen
-  - Gebruikers beheren
+  * Gebruikers overzicht
+  * Rollen toewijzen
+  * Gebruikers admin geven en uitdoen
+- Nieuwsbeheer
+  * Nieuws artikelen schrijven
+- Systeembeheer
+  * FAQ beheren
 
-## 🔧 Technische Implementatie
+## Technische Implementatie
 
-### Authenticatie & Autorisatie
-- Laravel Breeze authenticatie systeem
-  - Locatie: `app/Http/Controllers/Auth/`
-  - Middleware: `app/Http/Middleware/AdminMiddleware.php`
+### Admin Dashboard
+- Dashboard route: `routes/web.php` (regels 13-24)
+- Statistieken logica: `app/Http/Controllers/Admin/DashboardController.php` (regels 15-35)
+- Dashboard view: `resources/views/admin/dashboard.blade.php`
 
-### Database & Models
-- Eloquent ORM met relaties
-  - Models: `app/Models/`
-  - Migraties: `database/migrations/`
-  - Seeders: `database/seeders/`
+### Evenementenbeheer
+- Controller: `app/Http/Controllers/Admin/EventController.php` (regels 1-110)
+- Views: 
+  * Index: `resources/views/admin/events/index.blade.php`
+  * Create: `resources/views/admin/events/create.blade.php`
+  * Edit: `resources/views/admin/events/edit.blade.php`
 
-### Controllers
-- Resource Controllers voor CRUD operaties
-  - Admin Controllers: `app/Http/Controllers/Admin/`
-  - Public Controllers: `app/Http/Controllers/`
+### Authenticatie
+- Middleware: `app/Http/Middleware/AdminMiddleware.php`
+- Routes: `routes/web.php` (regels 49-55)
 
-### Views
-- Blade Templates met Tailwind CSS
-  - Layouts: `resources/views/layouts/`
-  - Components: `resources/views/components/`
-  - Admin Views: `resources/views/admin/`
+## Installatie
 
-### Routes
-- Georganiseerde route groepen
-  - Web Routes: `routes/web.php`
-  - Auth Routes: `routes/auth.php`
-
-## 📥 Installatie
-
-1. Clone de repository
+1. Clone project & installeer dependencies:
 ```bash
-git clone https://github.com/jouw-username/eventhub.git
+git clone [project-url]
 cd eventhub
-```
-
-2. Installeer dependencies
-```bash
 composer install
 npm install
 ```
 
-3. Configureer omgeving
+2. Setup configuratie:
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-4. Configureer database in .env
-```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=eventhub
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-5. Migreer database en voeg seeddata toe
+3. Database setup:
 ```bash
-php artisan migrate --seed
+php artisan migrate
 ```
 
-6. Start de ontwikkelserver
-```bash
-php artisan serve
-npm run dev
-```
+## Screenshots
+![Admin Dashboard](/docs/screenshots/admin-dashboard.png)
+![Evenementen Overzicht](/docs/screenshots/events-index.png)
+![Evenement Aanmaken](/docs/screenshots/event-create.png)
 
-7. Standaard admin account
-```
-Email: admin@ehb.be
-Wachtwoord: Password!321
-```
+## Gebruikte Bronnen
+- Laravel Documentatie
+- Tailwind CSS Documentatie
+- Laravel Daily Tutorials
+- chatgpt
 
-## 📸 Screenshots
-
-[Hier komen je screenshots van de applicatie]
-
-## 🔗 Gebruikte Bronnen
-
-### Frameworks & Libraries
-- [Laravel](https://laravel.com/) - PHP Framework
-- [Tailwind CSS](https://tailwindcss.com/) - CSS Framework
-- [Alpine.js](https://alpinejs.dev/) - JavaScript Framework
-
-### Packages
-- Laravel Breeze - Authenticatie
-- Intervention Image - Afbeeldingverwerking
-
-### AI Assistentie
-- Deze applicatie is ontwikkeld met hulp van AI (Claude) voor code-review, debugging en optimalisatie
-- De volledige AI chatlog is beschikbaar in: `docs/ai-chat-log.md`
-
-## 👥 Auteur
-
-[Jouw Naam]
-- GitHub: [@jouw-username](https://github.com/jouw-username)
-- Student aan: Erasmushogeschool Brussel
-- Academiejaar: 2023-2024
