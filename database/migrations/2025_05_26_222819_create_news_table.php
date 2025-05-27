@@ -14,10 +14,19 @@ return new class extends Migration
         Schema::create('news', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('image')->nullable();
+            $table->string('slug')->unique();
             $table->text('content');
+            $table->string('featured_image')->nullable();
+            $table->text('excerpt')->nullable();
+            $table->boolean('is_published')->default(false);
             $table->timestamp('published_at')->nullable();
+            $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
+            $table->integer('views')->default(0);
             $table->timestamps();
+            
+            // Indexes for better performance
+            $table->index(['is_published', 'published_at']);
+            $table->index('slug');
         });
     }
 
