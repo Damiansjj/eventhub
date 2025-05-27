@@ -6,9 +6,27 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 
 // Admin routes (only accessible to admin users)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin dashboard
+    Route::get('/', function() {
+        $stats = [
+            'users' => \App\Models\User::count(),
+            'news' => \App\Models\News::count(),
+            'events' => \App\Models\Event::count(),
+            'messages' => \App\Models\ContactMessage::count(),
+        ];
+        
+        $latestUsers = \App\Models\User::latest()->take(5)->get();
+        $latestNews = \App\Models\News::latest()->take(5)->get();
+        $latestEvents = \App\Models\Event::latest()->take(5)->get();
+        $unreadMessages = \App\Models\ContactMessage::where('is_read', false)->count();
+        
+        return view('admin.dashboard', compact('stats', 'latestUsers', 'latestNews', 'latestEvents', 'unreadMessages'));
+    })->name('dashboard');
+    
     // User management
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::patch('users/{id}/toggle-admin', [\App\Http\Controllers\Admin\UserController::class, 'toggleAdmin'])->name('users.toggle-admin');
@@ -27,7 +45,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('faq-items/{faqItem}', [App\Http\Controllers\Admin\FaqController::class, 'destroyItem'])->name('faq-items.destroy');
 
     // Event management
-    Route::resource('events', EventController::class)->except(['index', 'show']);
+    Route::resource('events', AdminEventController::class);
 });
 
 // Auth routes (Laravel Breeze)

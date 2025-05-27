@@ -11,66 +11,92 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-2">Gebruikers</h3>
-                    <p class="text-3xl">{{ $stats['users'] }}</p>
+                    <p class="text-3xl text-blue-600">{{ $stats['users'] }}</p>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-2">Nieuws</h3>
-                    <p class="text-3xl">{{ $stats['news'] }}</p>
+                    <p class="text-3xl text-green-600">{{ $stats['news'] }}</p>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-2">Evenementen</h3>
-                    <p class="text-3xl">{{ $stats['events'] }}</p>
+                    <p class="text-3xl text-purple-600">{{ $stats['events'] }}</p>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-2">Berichten</h3>
-                    <p class="text-3xl">{{ $stats['messages'] }}</p>
+                    <div class="flex items-center">
+                        <p class="text-3xl text-orange-600">{{ $stats['messages'] }}</p>
+                        @if($unreadMessages > 0)
+                            <span class="ml-3 bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                {{ $unreadMessages }} ongelezen
+                            </span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <!-- Laatste gebruikers -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-semibold mb-4">Laatste gebruikers</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naam</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Geregistreerd op</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($latestUsers as $user)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $user->username }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $user->email }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $user->created_at->format('d/m/Y H:i') }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->is_admin ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                            {{ $user->is_admin ? 'Admin' : 'Gebruiker' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            <!-- Recent Content Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Recente Gebruikers -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Recente Gebruikers</h3>
+                    <div class="space-y-4">
+                        @foreach($latestUsers as $user)
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">{{ $user->name }}</p>
+                                    <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500">
+                                    {{ $user->created_at->format('d/m/Y') }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <a href="{{ route('admin.users.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+                        Alle gebruikers →
+                    </a>
+                </div>
+
+                <!-- Recent Nieuws -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Nieuws</h3>
+                    <div class="space-y-4">
+                        @foreach($latestNews as $news)
+                            <div>
+                                <p class="font-medium">{{ $news->title }}</p>
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>{{ $news->author->name }}</span>
+                                    <span>{{ $news->created_at->format('d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <a href="{{ route('admin.news.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+                        Alle nieuws →
+                    </a>
+                </div>
+
+                <!-- Recente Evenementen -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Recente Evenementen</h3>
+                    <div class="space-y-4">
+                        @foreach($latestEvents as $event)
+                            <div>
+                                <p class="font-medium">{{ $event->title }}</p>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">{{ $event->start_date->format('d/m/Y') }}</span>
+                                    <span class="{{ $event->is_published ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $event->is_published ? 'Gepubliceerd' : 'Concept' }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <a href="{{ route('admin.events.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+                        Alle evenementen →
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> 
