@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
-use App\Models\User;
 use App\Mail\ContactFormMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -12,34 +11,25 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return view('contact.index');
+        return view('contact');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:2000',
+            'message' => 'required|string',
         ]);
 
-        // Sla contactbericht op
-        $contactMessage = ContactMessage::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'subject' => $request->subject,
-            'message' => $request->message,
-        ]);
+        // Sla het bericht op in de database
+        $message = ContactMessage::create($validated);
 
-        // Stuur email naar alle admins
-        $admins = User::where('is_admin', true)->get();
-        
-        foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ContactFormMail($contactMessage));
-        }
+        // Stuur e-mail naar admin
+        Mail::to(config('mail.admin_address', 'admin@ehb.be'))
+            ->send(new ContactFormMail($validated));
 
-        return redirect()->route('contact.index')
-            ->with('success', 'Bedankt voor je bericht! We nemen zo snel mogelijk contact met je op.');
+        return back()->with('success', 'Bedankt voor uw bericht! We nemen zo spoedig mogelijk contact met u op.');
     }
 }

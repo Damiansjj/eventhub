@@ -46,28 +46,25 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = $request->user();
-        $data = $request->validated();
+        $request->user()->fill($request->validated());
 
-        // Handle profile photo upload (both profile_picture and profile_photo)
-        if ($request->hasFile('profile_picture')) {
-            // Delete old photo if it exists
-            if ($user->profile_photo) {
-                Storage::delete($user->profile_photo);
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if exists
+            if ($request->user()->profile_photo) {
+                Storage::disk('public')->delete($request->user()->profile_photo);
             }
-            
-            $file = $request->file('profile_picture');
-            $path = $file->store('profile-photos', 'public');
-            $data['profile_photo'] = $path;
+
+            // Store new photo
+            $path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $request->user()->profile_photo = $path;
         }
 
-        $user->fill($data);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
+        $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -144,16 +141,17 @@ class ProfileController extends Controller
     /**
      * Remove profile photo
      */
-    public function removePhoto()
+    public function removePhoto(Request $request): RedirectResponse
     {
-        $user = Auth::user();
-        
+        $user = $request->user();
+
         if ($user->profile_photo) {
-            Storage::delete($user->profile_photo);
-            $user->update(['profile_photo' => null]);
+            Storage::disk('public')->delete($user->profile_photo);
+            $user->profile_photo = null;
+            $user->save();
         }
-        
-        return back()->with('success', 'Profielfoto verwijderd!');
+
+        return back()->with('status', 'photo-removed');
     }
 
     /**
@@ -166,6 +164,11 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Delete profile photo if exists
+        if ($user->profile_photo) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
 
         Auth::logout();
 

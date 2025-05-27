@@ -26,7 +26,7 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Laravel Breeze default profile routes (settings/account management)

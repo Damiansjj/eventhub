@@ -7,37 +7,61 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Gebruikers Overzicht</h3>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full table-auto">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="px-4 py-2 text-left">Naam</th>
-                                    <th class="px-4 py-2 text-left">Email</th>
-                                    <th class="px-4 py-2 text-left">Admin</th>
-                                    <th class="px-4 py-2 text-left">Aangemaakt</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($users as $user)
-                                <tr class="border-t">
-                                    <td class="px-4 py-2">{{ $user->name }}</td>
-                                    <td class="px-4 py-2">{{ $user->email }}</td>
-                                    <td class="px-4 py-2">
-                                        @if($user->is_admin)
-                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Admin</span>
-                                        @else
-                                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm">Gebruiker</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2">{{ $user->created_at->format('d-m-Y') }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            <!-- Statistieken -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-2">Gebruikers</h3>
+                    <p class="text-3xl">{{ $stats['users'] }}</p>
+                </div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-2">Nieuws</h3>
+                    <p class="text-3xl">{{ $stats['news'] }}</p>
+                </div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-2">Evenementen</h3>
+                    <p class="text-3xl">{{ $stats['events'] }}</p>
+                </div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-2">Berichten</h3>
+                    <p class="text-3xl">{{ $stats['messages'] }}</p>
+                </div>
+            </div>
+
+            <!-- Laatste activiteiten -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Laatste gebruikers -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Laatste gebruikers</h3>
+                    <div class="space-y-4">
+                        @foreach($latestUsers as $user)
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">{{ $user->name }}</p>
+                                    <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                                </div>
+                                <span class="text-sm text-gray-500">
+                                    {{ $user->created_at->format('d/m/Y') }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Laatste berichten -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Laatste berichten</h3>
+                    <div class="space-y-4">
+                        @foreach($latestMessages as $message)
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">{{ $message->subject }}</p>
+                                    <p class="text-sm text-gray-500">Van: {{ $message->name }}</p>
+                                </div>
+                                <span class="text-sm text-gray-500">
+                                    {{ $message->created_at->format('d/m/Y') }}
+                                </span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
