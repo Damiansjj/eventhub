@@ -50,12 +50,34 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Admin dashboard
     Route::get('/', function() {
-        $users = \App\Models\User::all();
-        return view('admin.dashboard', compact('users'));
+        $stats = [
+            'users' => \App\Models\User::count(),
+            'news' => \App\Models\News::count(),
+            'events' => \App\Models\Event::count(),
+            'messages' => \App\Models\ContactMessage::count(),
+        ];
+        
+        $latestUsers = \App\Models\User::latest()->take(5)->get();
+        
+        return view('admin.dashboard', compact('stats', 'latestUsers'));
     })->name('dashboard');
+    
+    // User management
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    Route::patch('users/{id}/toggle-admin', [\App\Http\Controllers\Admin\UserController::class, 'toggleAdmin'])->name('users.toggle-admin');
+    
+    // News management
+    Route::resource('news', \App\Http\Controllers\Admin\NewsController::class);
     
     // FAQ management
     Route::resource('faq-categories', App\Http\Controllers\Admin\FaqController::class);
+    
+    // FAQ item management
+    Route::get('faq-categories/{faqCategory}/items/create', [App\Http\Controllers\Admin\FaqController::class, 'createItem'])->name('faq-categories.create-item');
+    Route::post('faq-categories/{faqCategory}/items', [App\Http\Controllers\Admin\FaqController::class, 'storeItem'])->name('faq-categories.store-item');
+    Route::get('faq-items/{faqItem}/edit', [App\Http\Controllers\Admin\FaqController::class, 'editItem'])->name('faq-items.edit');
+    Route::put('faq-items/{faqItem}', [App\Http\Controllers\Admin\FaqController::class, 'updateItem'])->name('faq-items.update');
+    Route::delete('faq-items/{faqItem}', [App\Http\Controllers\Admin\FaqController::class, 'destroyItem'])->name('faq-items.destroy');
 
     // Event management
     Route::resource('events', EventController::class)->except(['index', 'show']);

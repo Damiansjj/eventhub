@@ -102,7 +102,7 @@ class ProfileController extends Controller
                 Rule::unique('users')->ignore($user->id)
             ],
             'birthday' => 'nullable|date|before:today',
-            'bio' => 'nullable|string|max:500',
+            'about_me' => 'nullable|string|max:500',
             'location' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -126,7 +126,7 @@ class ProfileController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'birthday' => $request->birthday,
-            'bio' => $request->bio,
+            'about_me' => $request->about_me,
             'location' => $request->location,
             'website' => $request->website,
         ]);

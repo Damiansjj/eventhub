@@ -27,6 +27,24 @@
                     <x-nav-link :href="route('profiles.index')" :active="request()->routeIs('profiles.*')">
                         {{ __('Profielen') }}
                     </x-nav-link>
+                    
+                    @if (Auth::check() && Auth::user()->isAdmin())
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-red-600 hover:text-red-900">
+                            {{ __('Admin Dashboard') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('admin.news.index')" :active="request()->routeIs('admin.news.*')" class="text-red-600 hover:text-red-900">
+                            {{ __('Nieuwsbeheer') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('admin.faq-categories.index')" :active="request()->routeIs('admin.faq-categories.*')" class="text-red-600 hover:text-red-900">
+                            {{ __('FAQ Beheer') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="text-red-600 hover:text-red-900">
+                            {{ __('Gebruikersbeheer') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -112,6 +130,24 @@
             <x-responsive-nav-link :href="route('profiles.index')" :active="request()->routeIs('profiles.*')">
                 {{ __('Profielen') }}
             </x-responsive-nav-link>
+            
+            @if (Auth::check() && Auth::user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-red-600">
+                    {{ __('Admin Dashboard') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('admin.news.index')" :active="request()->routeIs('admin.news.*')" class="text-red-600">
+                    {{ __('Nieuwsbeheer') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('admin.faq-categories.index')" :active="request()->routeIs('admin.faq-categories.*')" class="text-red-600">
+                    {{ __('FAQ Beheer') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="text-red-600">
+                    {{ __('Gebruikersbeheer') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

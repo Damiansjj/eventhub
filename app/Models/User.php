@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -18,23 +19,23 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'is_admin',
-        'profile_photo',
+        'username',
         'birthday',
         'about_me',
-        'username',
+        'profile_photo',
+        'is_admin',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -42,21 +43,21 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'is_admin' => 'boolean',
         'birthday' => 'date',
+        'is_admin' => 'boolean',
     ];
 
     /**
-     * Check if user is admin
+     * Check if the user is an admin
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->is_admin;
     }
@@ -64,15 +65,15 @@ class User extends Authenticatable
     /**
      * Make user admin
      */
-    public function makeAdmin()
+    public function makeAdmin(): void
     {
         $this->update(['is_admin' => true]);
     }
 
-   /**
+    /**
      * Remove admin rights
      */
-    public function removeAdmin()
+    public function removeAdmin(): void
     {
         $this->update(['is_admin' => false]);
     }
@@ -123,7 +124,11 @@ class User extends Authenticatable
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where('username', $value)->firstOrFail();
+        if (request()->is('profiles/*')) {
+            return $this->where('username', $value)->firstOrFail();
+        }
+        
+        return $this->where('id', $value)->firstOrFail();
     }
 
     /**
@@ -132,5 +137,15 @@ class User extends Authenticatable
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
+    }
+
+    /**
+     * Get the events the user is registered for
+     */
+    public function registeredEvents(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class)
+            ->withTimestamps()
+            ->withPivot('registered_at');
     }
 }

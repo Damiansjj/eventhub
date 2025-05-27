@@ -22,20 +22,26 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('Password!321'),
                 'is_admin' => true,
                 'email_verified_at' => now(),
+                'username' => 'admin'
             ]);
         }
 
+        // Create test user
         if (!User::where('email', 'test@example.com')->exists()) {
-            User::factory()->create([
+            User::create([
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'password' => Hash::make('Password!321'),
+                'email_verified_at' => now(),
+                'username' => 'testuser'
             ]);
         }
 
+        // Run other seeders
         $this->call([
-            AdminSeeder::class,
-            NewsSeeder::class,
             EventSeeder::class,
+            FaqSeeder::class,
+            NewsSeeder::class,
         ]);
     }
 }

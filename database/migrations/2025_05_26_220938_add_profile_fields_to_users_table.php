@@ -12,7 +12,9 @@ return new class extends Migration
             $table->string('username')->unique()->nullable();
             $table->date('birthday')->nullable();
             $table->string('profile_photo')->nullable();
-            $table->text('bio')->nullable();
+            $table->text('about_me')->nullable();
+            $table->string('location')->nullable();
+            $table->string('website')->nullable();
         });
     }
 
@@ -23,7 +25,9 @@ return new class extends Migration
                 'username', 
                 'birthday', 
                 'profile_photo', 
-                'bio'
+                'about_me',
+                'location',
+                'website'
             ]);
         });
     }
