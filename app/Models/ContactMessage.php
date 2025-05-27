@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ContactMessage extends Model
 {
@@ -11,6 +12,7 @@ class ContactMessage extends Model
         'email',
         'subject',
         'message',
+        'related_event_id',
         'is_read',
         'replied_at'
     ];
@@ -20,13 +22,27 @@ class ContactMessage extends Model
         'replied_at' => 'datetime',
     ];
 
-    public function markAsRead()
+    /**
+     * Get the event this message is related to.
+     */
+    public function event(): BelongsTo
     {
-        $this->update(['is_read' => true]);
+        return $this->belongsTo(Event::class, 'related_event_id');
     }
 
-    public function markAsReplied()
+    /**
+     * Mark the message as read.
+     */
+    public function markAsRead(): bool
     {
-        $this->update(['replied_at' => now()]);
+        return $this->update(['is_read' => true]);
+    }
+
+    /**
+     * Mark the message as replied.
+     */
+    public function markAsReplied(): bool
+    {
+        return $this->update(['replied_at' => now()]);
     }
 }

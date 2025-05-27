@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
+use App\Models\Event;
 use App\Mail\ContactFormMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
     public function index()
     {
-        return view('contact');
+        // Get upcoming events for the dropdown
+        $events = Event::where('start_date', '>=', now())
+            ->orderBy('start_date')
+            ->get();
+
+        return view('contact.index', compact('events'));
     }
 
     public function store(Request $request)
@@ -21,15 +28,22 @@ class ContactController extends Controller
             'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
+            'related_event_id' => 'nullable|exists:events,id'
         ]);
 
-        // Sla het bericht op in de database
+        // If user is logged in, use their name and email
+        if (Auth::check()) {
+            $validated['name'] = Auth::user()->name;
+            $validated['email'] = Auth::user()->email;
+        }
+
+        // Create the contact message
         $message = ContactMessage::create($validated);
 
-        // Stuur e-mail naar admin
+        // Send email to admin
         Mail::to(config('mail.admin_address', 'admin@ehb.be'))
-            ->send(new ContactFormMail($validated));
+            ->send(new ContactFormMail($message));
 
-        return back()->with('success', 'Bedankt voor uw bericht! We nemen zo spoedig mogelijk contact met u op.');
+        return back()->with('success', __('Bedankt voor je bericht! We nemen zo snel mogelijk contact met je op.'));
     }
 }

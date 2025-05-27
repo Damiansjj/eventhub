@@ -39,7 +39,10 @@ class ContactFormMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.contact-form',
+            markdown: 'emails.contact-form',
+            with: [
+                'data' => $this->data
+            ]
         );
     }
 
@@ -51,13 +54,5 @@ class ContactFormMail extends Mailable
     public function attachments(): array
     {
         return [];
-    }
-
-    public function build()
-    {
-        return $this->subject('Nieuw contactformulier bericht')
-                    ->markdown('emails.contact-form', [
-                        'data' => $this->data
-                    ]);
     }
 }

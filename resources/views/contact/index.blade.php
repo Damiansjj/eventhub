@@ -16,10 +16,9 @@
                     @endif
 
                     <div class="max-w-2xl">
-                        <h3 class="text-2xl font-bold mb-4">Neem contact met ons op</h3>
+                        <h3 class="text-2xl font-bold mb-4">{{ __('Contact EventsHub') }}</h3>
                         <p class="text-gray-600 mb-6">
-                            Heb je vragen, opmerkingen of suggesties? We horen graag van je! 
-                            Vul het onderstaande formulier in en we nemen zo snel mogelijk contact met je op.
+                            {{ __('Heb je vragen over een evenement of andere opmerkingen? We staan voor je klaar! Vul het onderstaande formulier in en we nemen zo snel mogelijk contact met je op.') }}
                         </p>
 
                         <form method="POST" action="{{ route('contact.store') }}" class="space-y-6">
@@ -27,62 +26,53 @@
 
                             <!-- Naam -->
                             <div>
-                                <label for="name" class="block font-medium text-sm text-gray-700">
-                                    Naam *
-                                </label>
-                                <input id="name" name="name" type="text" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
-                                       value="{{ old('name') }}" required>
-                                @error('name')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <x-input-label for="name" :value="__('Naam')" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
+                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
                             <!-- Email -->
                             <div>
-                                <label for="email" class="block font-medium text-sm text-gray-700">
-                                    Email *
-                                </label>
-                                <input id="email" name="email" type="email" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
-                                       value="{{ old('email') }}" required>
-                                @error('email')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <x-input-label for="email" :value="__('Email')" />
+                                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required />
+                                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                            </div>
+
+                            <!-- Gerelateerd Evenement -->
+                            <div>
+                                <x-input-label for="related_event_id" :value="__('Gerelateerd Evenement (Optioneel)')" />
+                                <select id="related_event_id" name="related_event_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">{{ __('Selecteer een evenement') }}</option>
+                                    @foreach($events as $event)
+                                        <option value="{{ $event->id }}" {{ old('related_event_id') == $event->id ? 'selected' : '' }}>
+                                            {{ $event->name }} ({{ $event->start_date->format('d/m/Y') }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('related_event_id')" class="mt-2" />
                             </div>
 
                             <!-- Onderwerp -->
                             <div>
-                                <label for="subject" class="block font-medium text-sm text-gray-700">
-                                    Onderwerp *
-                                </label>
-                                <input id="subject" name="subject" type="text" 
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
-                                       value="{{ old('subject') }}" required>
-                                @error('subject')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <x-input-label for="subject" :value="__('Onderwerp')" />
+                                <x-text-input id="subject" name="subject" type="text" class="mt-1 block w-full" :value="old('subject')" required />
+                                <x-input-error :messages="$errors->get('subject')" class="mt-2" />
                             </div>
 
                             <!-- Bericht -->
                             <div>
-                                <label for="message" class="block font-medium text-sm text-gray-700">
-                                    Bericht *
-                                </label>
+                                <x-input-label for="message" :value="__('Bericht')" />
                                 <textarea id="message" name="message" rows="5" 
-                                          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
-                                          required>{{ old('message') }}</textarea>
-                                @error('message')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                                    required>{{ old('message') }}</textarea>
+                                <x-input-error :messages="$errors->get('message')" class="mt-2" />
                             </div>
 
-                            <!-- Submit button -->
-                            <div>
-                                <button type="submit" 
-                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                    Bericht Versturen
-                                </button>
+                            <!-- Submit Button -->
+                            <div class="flex items-center justify-end mt-4">
+                                <x-primary-button class="ml-4">
+                                    {{ __('Verstuur Bericht') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>

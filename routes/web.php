@@ -24,6 +24,7 @@ Route::get('/profile/{user}', [App\Http\Controllers\ProfileController::class, 's
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
+// Dashboard route
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');

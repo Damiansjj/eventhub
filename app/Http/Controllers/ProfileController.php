@@ -23,7 +23,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Display the user's profile form (existing Laravel method)
+     * Display the user's profile form.
      */
     public function edit(Request $request): View
     {
@@ -42,29 +42,38 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information (existing Laravel method)
+     * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'username' => ['nullable', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'birthday' => ['nullable', 'date', 'before:today'],
+            'about_me' => ['nullable', 'string', 'max:1000'],
+            'profile_photo' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if exists
+            if ($user->profile_photo) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            // Store new photo
+            $path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $validated['profile_photo'] = $path;
+        }
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
-        // Handle profile photo upload
-        if ($request->hasFile('profile_photo')) {
-            // Delete old photo if exists
-            if ($request->user()->profile_photo) {
-                Storage::disk('public')->delete($request->user()->profile_photo);
-            }
-
-            // Store new photo
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $request->user()->profile_photo = $path;
-        }
-
-        $request->user()->save();
+        $user->fill($validated);
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -139,7 +148,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Remove profile photo
+     * Remove the user's profile photo.
      */
     public function removePhoto(Request $request): RedirectResponse
     {
@@ -155,7 +164,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account (existing Laravel method)
+     * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -171,7 +180,6 @@ class ProfileController extends Controller
         }
 
         Auth::logout();
-
         $user->delete();
 
         $request->session()->invalidate();
