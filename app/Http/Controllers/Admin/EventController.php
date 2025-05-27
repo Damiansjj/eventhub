@@ -8,10 +8,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Class EventController
+ * @package App\Http\Controllers\Admin
+ * 
+ * Handles all administrative operations for events including:
+ * - Listing all events (published and unpublished)
+ * - Creating new events
+ * - Updating existing events
+ * - Deleting events
+ * - Managing event publication status
+ */
 class EventController extends Controller
 {
     /**
-     * Display a listing of the events.
+     * Display a listing of all events.
+     * 
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -21,6 +34,8 @@ class EventController extends Controller
 
     /**
      * Show the form for creating a new event.
+     * 
+     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -29,6 +44,9 @@ class EventController extends Controller
 
     /**
      * Store a newly created event in storage.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -40,7 +58,7 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'max_participants' => 'nullable|integer|min:1',
             'price' => 'nullable|numeric|min:0',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:2048', // Max 2MB
             'is_published' => 'boolean'
         ]);
 
@@ -56,6 +74,9 @@ class EventController extends Controller
 
     /**
      * Show the form for editing the specified event.
+     * 
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\View\View
      */
     public function edit(Event $event)
     {
@@ -64,6 +85,10 @@ class EventController extends Controller
 
     /**
      * Update the specified event in storage.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Event $event)
     {
@@ -80,7 +105,7 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image
+            // Delete old image if exists
             if ($event->image) {
                 Storage::disk('public')->delete($event->image);
             }
@@ -95,6 +120,10 @@ class EventController extends Controller
 
     /**
      * Remove the specified event from storage.
+     * Also removes associated image file if exists.
+     * 
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Event $event)
     {
