@@ -10,11 +10,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Show a user's public profile
+     */
+    public function show(User $user)
+    {
+        return view('profiles.show', compact('user'));
+    }
+
+    /**
+     * Display the user's profile form (existing Laravel method)
      */
     public function edit(Request $request): View
     {
@@ -24,35 +33,131 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Show the form for editing the authenticated user's profile (new public profiles)
      */
-   public function update(ProfileUpdateRequest $request): RedirectResponse
-{
-    $user = $request->user();
-
-    $data = $request->validated();
-
-    // Als er een profielfoto is geüpload
-    if ($request->hasFile('profile_picture')) {
-        $file = $request->file('profile_picture');
-        $path = $file->store('profile_pictures', 'public');
-        $data['profile_picture'] = $path;
+    public function editPublic()
+    {
+        $user = Auth::user();
+        return view('profiles.edit', compact('user'));
     }
-
-    $user->fill($data);
-
-    if ($user->isDirty('email')) {
-        $user->email_verified_at = null;
-    }
-
-    $user->save();
-
-    return Redirect::route('profile.edit')->with('status', 'profile-updated');
-}
-
 
     /**
-     * Delete the user's account.
+     * Update the user's profile information (existing Laravel method)
+     */
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $data = $request->validated();
+
+        // Handle profile photo upload (both profile_picture and profile_photo)
+        if ($request->hasFile('profile_picture')) {
+            // Delete old photo if it exists
+            if ($user->profile_photo) {
+                Storage::delete($user->profile_photo);
+            }
+            
+            $file = $request->file('profile_picture');
+            $path = $file->store('profile-photos', 'public');
+            $data['profile_photo'] = $path;
+        }
+
+        $user->fill($data);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the authenticated user's public profile
+     */
+    public function updatePublic(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => [
+                'nullable',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('users')->ignore($user->id)
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id)
+            ],
+            'birthday' => 'nullable|date|before:today',
+            'bio' => 'nullable|string|max:500',
+            'location' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if it exists
+            if ($user->profile_photo) {
+                Storage::delete($user->profile_photo);
+            }
+            
+            // Store new photo
+            $path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $user->profile_photo = $path;
+        }
+
+        // Update user data
+        $user->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'birthday' => $request->birthday,
+            'bio' => $request->bio,
+            'location' => $request->location,
+            'website' => $request->website,
+        ]);
+
+        return redirect()->route('profiles.show', $user->username ?: $user->id)
+            ->with('success', 'Profiel succesvol bijgewerkt!');
+    }
+
+    /**
+     * Show all users for browsing
+     */
+    public function index()
+    {
+        $users = User::whereNotNull('username')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+            
+        return view('profiles.index', compact('users'));
+    }
+
+    /**
+     * Remove profile photo
+     */
+    public function removePhoto()
+    {
+        $user = Auth::user();
+        
+        if ($user->profile_photo) {
+            Storage::delete($user->profile_photo);
+            $user->update(['profile_photo' => null]);
+        }
+        
+        return back()->with('success', 'Profielfoto verwijderd!');
+    }
+
+    /**
+     * Delete the user's account (existing Laravel method)
      */
     public function destroy(Request $request): RedirectResponse
     {

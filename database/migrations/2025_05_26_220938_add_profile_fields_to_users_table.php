@@ -6,27 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->string('username')->nullable();
-        $table->date('birthday')->nullable();
-        $table->text('about_me')->nullable();
-        $table->string('profile_picture')->nullable(); // Pad naar afbeelding
-    });
-}
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('username')->unique()->nullable();
+            $table->date('birthday')->nullable();
+            $table->string('profile_photo')->nullable();
+            $table->text('bio')->nullable();
+        });
+    }
 
-
-    /**
-     * Reverse the migrations.
-     */
-   public function down(): void
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['username', 'birthday', 'about_me', 'profile_picture']);
-    });
-}
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn([
+                'username', 
+                'birthday', 
+                'profile_photo', 
+                'bio'
+            ]);
+        });
+    }
 };
