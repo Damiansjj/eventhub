@@ -76,15 +76,8 @@ php artisan key:generate
 ```bash
 php artisan migrate
 ```
-
-## Screenshots
-![Admin Dashboard](/docs/screenshots/admin-dashboard.png)
-![Evenementen Overzicht](/docs/screenshots/events-index.png)
-![Evenement Aanmaken](/docs/screenshots/event-create.png)
-
 ## Gebruikte Bronnen
 - Laravel Documentatie
 - Tailwind CSS Documentatie
 - Laravel Daily Tutorials
 - chatgpt
-
